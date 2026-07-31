@@ -12,6 +12,7 @@
     --bg:#F5F7F1; --surface:#fff; --ink:#2A2D28; --sub:#77837A; --line:#E5E9E0;
     --green:#3E6B4E; --green-dark:#345C42; --green-soft:#EAF1EA;
     --honey:#CE8524; --honey-soft:#FBEFD9; --honey-line:#F0DCB4;
+    --kid:#4A7A9E; --kid-soft:#E7EFF4;
     --sun:#C0563E; --sat:#3E6B8E;
     --font:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   }
@@ -32,7 +33,7 @@
   .spinner{width:34px;height:34px;border:3px solid var(--green-soft);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
   .brand{display:flex;align-items:center;gap:10px;}
   .brand h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.02em;}
   .top-right{display:flex;align-items:center;gap:8px;}
@@ -40,6 +41,11 @@
   .today-btn:active{background:var(--green-soft);}
   .acct{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;}
   .acct:active{background:var(--bg);}
+
+  .plan-tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px;}
+  .plan-tab{flex:1;border:none;background:transparent;border-radius:9px;padding:10px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;}
+  .plan-tab.active{background:var(--green-soft);color:var(--green);}
+  .plan-tab.active[data-plan="kids"]{background:var(--kid-soft);color:var(--kid);}
 
   .monthbar{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:14px;}
   .navbtn{background:#fff;border:1px solid var(--line);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);font-size:20px;}
@@ -55,6 +61,7 @@
   .cell.blank{background:transparent;border-color:transparent;cursor:default;}
   .daynum{font-size:13px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
   .daynum.today{background:var(--green);color:#fff;}
+  body.kids .daynum.today{background:var(--kid);}
   .daynum.sun{color:var(--sun);} .daynum.sat{color:var(--sat);}
   .preview{font-size:11px;line-height:1.3;color:var(--sub);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
@@ -81,14 +88,12 @@
   #saveStatus{font-weight:700;}
   #saveStatus.saved{color:var(--green);} #saveStatus.pending{color:var(--honey);}
 
-  /* 자동추천 드롭다운 */
   .suggest{position:relative;flex:1;}
   .suggest-box{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:20;overflow:hidden;max-height:220px;overflow-y:auto;}
   .suggest-item{padding:10px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;}
   .suggest-item:active{background:var(--green-soft);}
   .suggest-item .u{margin-left:auto;font-size:11px;color:var(--honey);font-weight:700;}
 
-  /* 편집 시트 */
   .overlay{position:fixed;inset:0;background:rgba(30,40,32,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .overlay.show{display:flex;}
   .sheet{background:var(--bg);border-radius:20px;width:100%;max-width:460px;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
@@ -96,6 +101,9 @@
   .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .sheet-title{font-size:18px;font-weight:800;letter-spacing:-.01em;}
   .sheet-title span{color:var(--sub);font-weight:600;font-size:15px;}
+  .sheet-title .pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:6px;}
+  .pill.adult{background:var(--green-soft);color:var(--green);}
+  .pill.kids{background:var(--kid-soft);color:var(--kid);}
   .closebtn{border:none;background:none;cursor:pointer;color:var(--sub);font-size:24px;line-height:1;padding:0 2px;}
   .flabel{font-size:13px;font-weight:700;color:var(--sub);display:block;margin-bottom:9px;}
 
@@ -113,7 +121,7 @@
   .done{margin-top:22px;width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
   .done:active{background:var(--green-dark);}
   .mt8{margin-top:8px;}
-  @media (max-width:520px){ .cell{min-height:60px;} .preview{-webkit-line-clamp:2;} }
+  @media (max-width:520px){ .cell{min-height:60px;} }
 </style>
 </head>
 <body>
@@ -124,13 +132,13 @@
   <div class="login-card">
     <div class="logo">🍳</div>
     <h1>식단 달력</h1>
-    <p>PC와 폰에서 같은 식단을 보려면<br>구글 계정으로 로그인하세요.</p>
+    <p>구글 계정으로 로그인하세요.<br>허용된 사람끼리 같은 식단을 함께 봐요.</p>
     <button id="googleLoginBtn" class="gbtn">
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
       Google로 로그인
     </button>
     <div id="loginError" class="login-note" style="color:var(--sun);"></div>
-    <div class="login-note">데이터는 정용님 본인 계정에만 저장돼요.</div>
+    <div class="login-note">허용 목록에 등록된 구글 계정만 접근할 수 있어요.</div>
   </div>
 </div>
 
@@ -141,6 +149,11 @@
       <button class="today-btn" id="todayBtn">오늘</button>
       <button class="acct" id="logoutBtn">로그아웃</button>
     </div>
+  </div>
+
+  <div class="plan-tabs">
+    <button class="plan-tab active" data-plan="adult">🍚 성인</button>
+    <button class="plan-tab" data-plan="kids">🍼 유아식</button>
   </div>
 
   <div class="monthbar">
@@ -172,7 +185,7 @@
     </div>
   </div>
 
-  <p class="foot">PC·폰 어디서 열어도 같은 내용이 떠요. · <span id="saveStatus" class="saved">저장됨</span></p>
+  <p class="foot">허용된 사람끼리 같은 식단을 공유해요. · <span id="saveStatus" class="saved">저장됨</span></p>
 </div>
 
 <div class="overlay" id="overlay">
@@ -212,60 +225,76 @@
   const db = getFirestore(fbApp);
   const provider = new GoogleAuthProvider();
 
+  // 공용 문서 (허용된 사람끼리 공유)
+  const SHARED = () => doc(db, "shared", "mealplan");
+
   const WEEKDAYS = ["일","월","화","수","목","금","토"];
+  const PLAN_LABEL = { adult:"성인", kids:"유아식" };
   const $ = (id) => document.getElementById(id);
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   const keyOf = (y,m,d) => y + "-" + (m+1) + "-" + d;
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const normUrl = (u) => { const t=(u||"").trim(); if(!t) return ""; return /^https?:\/\//i.test(t)?t:"https://"+t; };
 
-  let state = { meals:{}, have:[], buy:[], dishLibrary:[], ingredientLibrary:[] };
+  const blankPlan = () => ({ meals:{}, dishLibrary:[], have:[], buy:[], ingredientLibrary:[] });
+  let state = { plans:{ adult:blankPlan(), kids:blankPlan() } };
+  let currentPlan = "adult";
   let currentUser = null, saveTimer = null, selKey = null, editDishId = null;
   const today = new Date();
   let vy = today.getFullYear(), vm = today.getMonth();
 
-  const entryOf = (k) => state.meals[k] || { dishes:[] };
-  const hasContent = (k) => { const e=state.meals[k]; return e && e.dishes && e.dishes.length; };
-  const cacheKey = () => "mealCalendar:v2:" + (currentUser ? currentUser.uid : "anon");
+  const P = () => state.plans[currentPlan];
+  const entryOf = (k) => P().meals[k] || { dishes:[] };
+  const cacheKey = () => "mealCalendar:v3:" + (currentUser ? currentUser.uid : "anon");
+
+  function upsertDish(planKey,name,url){
+    name=(name||"").trim(); if(!name) return;
+    const lib=state.plans[planKey].dishLibrary;
+    const i=lib.findIndex(d=>d.name===name);
+    if(i>=0){ if(url) lib[i].url=url; } else lib.push({name,url:url||""});
+  }
+  function upsertIngredient(planKey,name){
+    name=(name||"").trim(); if(!name) return;
+    const lib=state.plans[planKey].ingredientLibrary;
+    if(!lib.includes(name)) lib.push(name);
+  }
 
   function normalizeState(){
-    if(!state.meals) state.meals={};
-    if(!state.have) state.have=[];
-    if(!state.buy) state.buy=[];
-    if(!state.dishLibrary) state.dishLibrary=[];
-    if(!state.ingredientLibrary) state.ingredientLibrary=[];
-    // 예전 형식(menu/recipes) → 요리 목록으로 변환
-    Object.keys(state.meals).forEach(k=>{
-      const e=state.meals[k]; if(!e) return;
-      if(!e.dishes){
-        e.dishes=[];
-        if(e.menu && e.menu.trim()){
-          const names=e.menu.split(",").map(s=>s.trim()).filter(Boolean);
-          names.forEach((nm,idx)=> e.dishes.push({id:uid(), name:nm, url:(idx===0 && e.recipes && e.recipes[0])?e.recipes[0].url:""}));
+    if(!state.plans){
+      if(state.meals || state.have || state.buy){
+        state = { plans:{ adult:{
+          meals:state.meals||{}, dishLibrary:state.dishLibrary||[],
+          have:state.have||[], buy:state.buy||[], ingredientLibrary:state.ingredientLibrary||[]
+        }, kids:blankPlan() } };
+      } else { state = { plans:{ adult:blankPlan(), kids:blankPlan() } }; }
+    }
+    for(const key of ["adult","kids"]){
+      if(!state.plans[key]) state.plans[key]=blankPlan();
+      const pl=state.plans[key];
+      if(!pl.meals) pl.meals={};
+      if(!pl.dishLibrary) pl.dishLibrary=[];
+      if(!pl.have) pl.have=[];
+      if(!pl.buy) pl.buy=[];
+      if(!pl.ingredientLibrary) pl.ingredientLibrary=[];
+      Object.keys(pl.meals).forEach(k=>{
+        const e=pl.meals[k]; if(!e) return;
+        if(!e.dishes){
+          e.dishes=[];
+          if(e.menu && e.menu.trim()){
+            e.menu.split(",").map(s=>s.trim()).filter(Boolean).forEach((nm,idx)=> e.dishes.push({id:uid(),name:nm,url:(idx===0&&e.recipes&&e.recipes[0])?e.recipes[0].url:""}));
+          }
+          delete e.menu; delete e.recipes;
         }
-        delete e.menu; delete e.recipes;
-      }
-    });
-    // 라이브러리 히스토리 반영
-    Object.values(state.meals).forEach(e=> (e.dishes||[]).forEach(d=> upsertDish(d.name, d.url)));
-    state.have.concat(state.buy).forEach(i=> upsertIngredient(i.name));
-  }
-
-  function upsertDish(name, url){
-    name=(name||"").trim(); if(!name) return;
-    const i=state.dishLibrary.findIndex(d=>d.name===name);
-    if(i>=0){ if(url) state.dishLibrary[i].url=url; }
-    else state.dishLibrary.push({name, url:url||""});
-  }
-  function upsertIngredient(name){
-    name=(name||"").trim(); if(!name) return;
-    if(!state.ingredientLibrary.includes(name)) state.ingredientLibrary.push(name);
+      });
+      Object.values(pl.meals).forEach(e=> (e.dishes||[]).forEach(d=> upsertDish(key,d.name,d.url)));
+      pl.have.concat(pl.buy).forEach(i=> upsertIngredient(key,i.name));
+    }
   }
 
   async function loadFromCloud(){
     try{ const c=localStorage.getItem(cacheKey()); if(c) state=JSON.parse(c); }catch(e){}
     try{
-      const snap = await getDoc(doc(db,"users",currentUser.uid));
+      const snap = await getDoc(SHARED());
       if(snap.exists() && snap.data().data) state=JSON.parse(snap.data().data);
       normalizeState();
       try{ localStorage.setItem(cacheKey(), JSON.stringify(state)); }catch(e){}
@@ -284,34 +313,30 @@
     setSave("pending");
     clearTimeout(saveTimer);
     saveTimer=setTimeout(async ()=>{
-      try{ await setDoc(doc(db,"users",currentUser.uid),{data:JSON.stringify(state),updatedAt:Date.now()}); setSave("saved"); }
+      try{ await setDoc(SHARED(),{data:JSON.stringify(state),updatedAt:Date.now(),updatedBy:currentUser.email||""}); setSave("saved"); }
       catch(e){ console.error("저장 실패:",e); setSave("wait"); }
     },700);
   }
 
   function hideSuggest(id){ const b=$(id); if(b){ b.classList.add("hidden"); b.innerHTML=""; } }
 
-  // ── 요일 ──
   function renderDow(){
     let h=""; for(let i=0;i<7;i++){ h+='<div class="'+(i===0?"dow s":(i===6?"dow t":"dow"))+'">'+WEEKDAYS[i]+'</div>'; }
     $("dowRow").innerHTML=h;
   }
 
-  // ── 달력 ──
   function renderCalendar(){
     $("monthLabel").textContent = vy+"년 "+(vm+1)+"월";
     const firstDow=new Date(vy,vm,1).getDay(), days=new Date(vy,vm+1,0).getDate();
     const thisMonth=(vy===today.getFullYear()&&vm===today.getMonth());
+    const meals=P().meals;
     let h="";
     for(let b=0;b<firstDow;b++) h+='<div class="cell blank"></div>';
     for(let d=1;d<=days;d++){
       const k=keyOf(vy,vm,d), dow=(firstDow+d-1)%7, isT=thisMonth&&d===today.getDate();
       const numCls="daynum"+(isT?" today":(dow===0?" sun":(dow===6?" sat":"")));
-      const e=state.meals[k];
-      let inner="";
-      if(e && e.dishes && e.dishes.length){
-        inner='<span class="preview">'+esc(e.dishes.map(x=>x.name).join(" · "))+'</span>';
-      }
+      const e=meals[k]; let inner="";
+      if(e && e.dishes && e.dishes.length) inner='<span class="preview">'+esc(e.dishes.map(x=>x.name).join(" · "))+'</span>';
       h+='<button class="cell" data-key="'+k+'"><span><span class="'+numCls+'">'+d+'</span></span>'+inner+'</button>';
     }
     let total=firstDow+days; while(total%7!==0){ h+='<div class="cell blank"></div>'; total++; }
@@ -319,10 +344,9 @@
     grid.querySelectorAll(".cell[data-key]").forEach(c=> c.addEventListener("click",()=>openSheet(c.getAttribute("data-key"))));
   }
 
-  // ── 식재료 ──
   function renderItems(){ renderList("have","haveItems","haveCount",false); renderList("buy","buyItems","buyCount",true); }
   function renderList(listName,containerId,countId,withMove){
-    const arr=state[listName]; $(countId).textContent=arr.length;
+    const arr=P()[listName]; $(countId).textContent=arr.length;
     const box=$(containerId);
     if(arr.length===0){ box.className="empty-note"; box.innerHTML="아직 없어요. 아래에 추가해 보세요."; return; }
     box.className="items"; let h="";
@@ -336,47 +360,48 @@
   }
   function addItem(listName,inputId,boxId){
     const el=$(inputId); const name=el.value.trim(); if(!name) return;
-    state[listName].push({id:uid(),name}); upsertIngredient(name);
+    P()[listName].push({id:uid(),name}); upsertIngredient(currentPlan,name);
     el.value=""; hideSuggest(boxId); save(); renderItems();
   }
-  function removeItem(listName,id){ state[listName]=state[listName].filter(i=>i.id!==id); save(); renderItems(); }
+  function removeItem(listName,id){ const a=P(); a[listName]=a[listName].filter(i=>i.id!==id); save(); renderItems(); }
   function moveToHave(id){
-    let item=null; state.buy=state.buy.filter(i=>{ if(i.id===id){item=i;return false;} return true; });
-    if(item) state.have.push(item); save(); renderItems();
+    const a=P(); let item=null;
+    a.buy=a.buy.filter(i=>{ if(i.id===id){item=i;return false;} return true; });
+    if(item) a.have.push(item); save(); renderItems();
   }
 
-  // 식재료 자동추천
   function wireIngredientSuggest(inputId,boxId,listName){
     const inp=$(inputId);
     inp.addEventListener("input",()=>{
       const v=inp.value.trim().toLowerCase();
       if(!v){ hideSuggest(boxId); return; }
-      const have=new Set(state[listName].map(i=>i.name));
-      const matches=state.ingredientLibrary.filter(n=>n.toLowerCase().includes(v)&&!have.has(n)).slice(0,6);
+      const have=new Set(P()[listName].map(i=>i.name));
+      const matches=P().ingredientLibrary.filter(n=>n.toLowerCase().includes(v)&&!have.has(n)).slice(0,6);
       if(!matches.length){ hideSuggest(boxId); return; }
       const box=$(boxId);
       box.innerHTML=matches.map(n=>'<div class="suggest-item" data-name="'+esc(n)+'">'+esc(n)+'</div>').join("");
       box.classList.remove("hidden");
       box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",e=>{
         e.preventDefault();
-        state[listName].push({id:uid(),name:it.getAttribute("data-name")});
+        P()[listName].push({id:uid(),name:it.getAttribute("data-name")});
         inp.value=""; hideSuggest(boxId); save(); renderItems(); inp.focus();
       }));
     });
     inp.addEventListener("blur",()=>setTimeout(()=>hideSuggest(boxId),150));
   }
 
-  // ── 날짜 편집(요리 단위) ──
   function openSheet(k){
     selKey=k; editDishId=null;
     const p=k.split("-"), y=+p[0], mo=+p[1]-1, d=+p[2];
-    $("sheetTitle").innerHTML=(mo+1)+"월 "+d+"일 <span>("+WEEKDAYS[new Date(y,mo,d).getDay()]+")</span>";
+    const pillCls = currentPlan==="kids"?"kids":"adult";
+    $("sheetTitle").innerHTML=(mo+1)+"월 "+d+"일 <span>("+WEEKDAYS[new Date(y,mo,d).getDay()]+")</span>"
+      +'<span class="pill '+pillCls+'">'+PLAN_LABEL[currentPlan]+'</span>';
     $("dishName").value=""; $("dishUrl").value=""; hideSuggest("dishSuggest");
     renderDishes();
     $("overlay").classList.add("show");
   }
   function closeSheet(){ $("overlay").classList.remove("show"); selKey=null; editDishId=null; }
-  function ensureEntry(k){ if(!state.meals[k]) state.meals[k]={dishes:[]}; if(!state.meals[k].dishes) state.meals[k].dishes=[]; return state.meals[k]; }
+  function ensureEntry(k){ const m=P().meals; if(!m[k]) m[k]={dishes:[]}; if(!m[k].dishes) m[k].dishes=[]; return m[k]; }
 
   function renderDishes(){
     const e=entryOf(selKey), box=$("dishList");
@@ -403,23 +428,22 @@
     const name=$("dishName").value.trim(); if(!name) return;
     const url=normUrl($("dishUrl").value);
     const e=ensureEntry(selKey); e.dishes.push({id:uid(),name,url});
-    upsertDish(name,url);
+    upsertDish(currentPlan,name,url);
     $("dishName").value=""; $("dishUrl").value=""; hideSuggest("dishSuggest");
     save(); renderDishes(); renderCalendar();
   }
-  function removeDish(id){ const e=state.meals[selKey]; if(!e||!e.dishes) return; e.dishes=e.dishes.filter(d=>d.id!==id); save(); renderDishes(); renderCalendar(); }
+  function removeDish(id){ const e=P().meals[selKey]; if(!e||!e.dishes) return; e.dishes=e.dishes.filter(d=>d.id!==id); save(); renderDishes(); renderCalendar(); }
   function saveDishUrl(id,raw){
-    const e=state.meals[selKey]; if(!e||!e.dishes) return;
+    const e=P().meals[selKey]; if(!e||!e.dishes) return;
     const d=e.dishes.find(x=>x.id===id); if(!d) return;
-    d.url=normUrl(raw); upsertDish(d.name,d.url); editDishId=null;
+    d.url=normUrl(raw); upsertDish(currentPlan,d.name,d.url); editDishId=null;
     save(); renderDishes(); renderCalendar();
   }
 
-  // 요리 자동추천 (고르면 저장된 레시피 링크까지 바로 등록)
   $("dishName").addEventListener("input",()=>{
     const v=$("dishName").value.trim().toLowerCase();
     if(!v){ hideSuggest("dishSuggest"); return; }
-    const matches=state.dishLibrary.filter(d=>d.name.toLowerCase().includes(v)).slice(0,6);
+    const matches=P().dishLibrary.filter(d=>d.name.toLowerCase().includes(v)).slice(0,6);
     if(!matches.length){ hideSuggest("dishSuggest"); return; }
     const box=$("dishSuggest");
     box.innerHTML=matches.map(d=>'<div class="suggest-item" data-name="'+esc(d.name)+'" data-url="'+esc(d.url||"")+'">'+esc(d.name)+(d.url?'<span class="u">↗ 레시피</span>':'')+'</div>').join("");
@@ -427,7 +451,7 @@
     box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",ev=>{
       ev.preventDefault();
       const nm=it.getAttribute("data-name"), u=it.getAttribute("data-url");
-      const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u}); upsertDish(nm,u);
+      const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u}); upsertDish(currentPlan,nm,u);
       $("dishName").value=""; $("dishUrl").value=""; hideSuggest("dishSuggest");
       save(); renderDishes(); renderCalendar(); $("dishName").focus();
     }));
@@ -437,7 +461,16 @@
   $("dishUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addDish(); });
   $("dishAdd").addEventListener("click",addDish);
 
-  // ── 정적 이벤트 ──
+  // 식단 전환
+  function switchPlan(plan){
+    if(plan===currentPlan) return;
+    currentPlan=plan; closeSheet();
+    document.body.classList.toggle("kids", plan==="kids");
+    document.querySelectorAll(".plan-tab").forEach(t=> t.classList.toggle("active", t.getAttribute("data-plan")===plan));
+    renderCalendar(); renderItems();
+  }
+  document.querySelectorAll(".plan-tab").forEach(t=> t.addEventListener("click",()=> switchPlan(t.getAttribute("data-plan"))));
+
   $("prevBtn").addEventListener("click",()=>{ const n=new Date(vy,vm-1,1); vy=n.getFullYear(); vm=n.getMonth(); renderCalendar(); });
   $("nextBtn").addEventListener("click",()=>{ const n=new Date(vy,vm+1,1); vy=n.getFullYear(); vm=n.getMonth(); renderCalendar(); });
   $("todayBtn").addEventListener("click",()=>{ vy=today.getFullYear(); vm=today.getMonth(); renderCalendar(); });
@@ -451,7 +484,6 @@
   wireIngredientSuggest("haveInput","haveSuggest","have");
   wireIngredientSuggest("buyInput","buySuggest","buy");
 
-  // ── 로그인 ──
   $("googleLoginBtn").addEventListener("click",async ()=>{
     $("loginError").textContent="";
     try{ await signInWithPopup(auth,provider); }
