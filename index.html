@@ -95,7 +95,10 @@
   .suggest-box{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:20;overflow:hidden;max-height:240px;overflow-y:auto;}
   .suggest-item{padding:10px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;}
   .suggest-item:active{background:var(--green-soft);}
-  .suggest-item .u{margin-left:auto;font-size:11px;color:var(--honey);font-weight:700;white-space:nowrap;}
+  .suggest-item .si-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .suggest-item .u{font-size:11px;color:var(--honey);font-weight:700;white-space:nowrap;margin-left:8px;}
+  .suggest-item .si-del{border:none;background:none;color:var(--sub);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;margin-left:6px;}
+  .suggest-item .si-del:active{color:var(--sun);}
 
   .overlay{position:fixed;inset:0;background:rgba(30,40,32,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .overlay.show{display:flex;}
@@ -321,8 +324,8 @@
         }
         (e.dishes||[]).forEach(d=>{ if(!d.meal) d.meal="dinner"; });
       });
-      Object.values(pl.meals).forEach(e=> (e.dishes||[]).forEach(d=> upsertDish(key,d.name,d.url)));
-      pl.have.concat(pl.buy).forEach(i=> upsertIngredient(key,i.name));
+      if(pl.dishLibrary.length===0) Object.values(pl.meals).forEach(e=> (e.dishes||[]).forEach(d=> upsertDish(key,d.name,d.url)));
+      if(pl.ingredientLibrary.length===0) pl.have.concat(pl.buy).forEach(i=> upsertIngredient(key,i.name));
     }
   }
 
@@ -410,21 +413,30 @@
 
   function wireIngredientSuggest(inputId,boxId,listName){
     const inp=$(inputId);
-    inp.addEventListener("input",()=>{
+    function build(){
       const v=inp.value.trim().toLowerCase();
       if(!v){ hideSuggest(boxId); return; }
       const have=new Set(P()[listName].map(i=>i.name));
       const matches=P().ingredientLibrary.filter(n=>n.toLowerCase().includes(v)&&!have.has(n)).slice(0,6);
       if(!matches.length){ hideSuggest(boxId); return; }
       const box=$(boxId);
-      box.innerHTML=matches.map(n=>'<div class="suggest-item" data-name="'+esc(n)+'">'+esc(n)+'</div>').join("");
+      box.innerHTML=matches.map(n=>'<div class="suggest-item" data-name="'+esc(n)+'"><span class="si-name">'+esc(n)+'</span><button class="si-del" title="기억에서 지우기">×</button></div>').join("");
       box.classList.remove("hidden");
-      box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",e=>{
-        e.preventDefault();
-        P()[listName].push({id:uid(),name:it.getAttribute("data-name")});
-        inp.value=""; hideSuggest(boxId); save(); renderItems(); inp.focus();
-      }));
-    });
+      box.querySelectorAll(".suggest-item").forEach(it=>{
+        it.addEventListener("mousedown",e=>{
+          e.preventDefault();
+          P()[listName].push({id:uid(),name:it.getAttribute("data-name")});
+          inp.value=""; hideSuggest(boxId); save(); renderItems(); inp.focus();
+        });
+        it.querySelector(".si-del").addEventListener("mousedown",e=>{
+          e.preventDefault(); e.stopPropagation();
+          const nm=it.getAttribute("data-name");
+          P().ingredientLibrary=P().ingredientLibrary.filter(x=>x!==nm);
+          save(); build();
+        });
+      });
+    }
+    inp.addEventListener("input",build);
     inp.addEventListener("blur",()=>setTimeout(()=>hideSuggest(boxId),150));
   }
 
@@ -565,16 +577,25 @@
     if(!arr.length){ hideSuggest("dishSuggest"); return; }
     box.innerHTML=arr.map(x=>{
       const tags=[]; if(x.wish) tags.push("⭐"); if(x.url) tags.push("↗레시피");
-      return '<div class="suggest-item" data-name="'+esc(x.name)+'" data-url="'+esc(x.url)+'">'+esc(x.name)+(tags.length?'<span class="u">'+tags.join(" ")+'</span>':'')+'</div>';
+      return '<div class="suggest-item" data-name="'+esc(x.name)+'" data-url="'+esc(x.url)+'"><span class="si-name">'+esc(x.name)+'</span>'+(tags.length?'<span class="u">'+tags.join(" ")+'</span>':'')+'<button class="si-del" title="추천에서 지우기">×</button></div>';
     }).join("");
     box.classList.remove("hidden");
-    box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",ev=>{
-      ev.preventDefault();
-      const nm=it.getAttribute("data-name"), u=it.getAttribute("data-url");
-      const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u,meal:addMeal}); upsertDish(currentPlan,nm,u);
-      $("dishName").value=""; $("dishUrl").value="";
-      save(); renderDishes(); renderCalendar(); $("dishName").focus(); showDishSuggest();
-    }));
+    box.querySelectorAll(".suggest-item").forEach(it=>{
+      it.addEventListener("mousedown",ev=>{
+        ev.preventDefault();
+        const nm=it.getAttribute("data-name"), u=it.getAttribute("data-url");
+        const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u,meal:addMeal}); upsertDish(currentPlan,nm,u);
+        $("dishName").value=""; $("dishUrl").value="";
+        save(); renderDishes(); renderCalendar(); $("dishName").focus(); showDishSuggest();
+      });
+      it.querySelector(".si-del").addEventListener("mousedown",ev=>{
+        ev.preventDefault(); ev.stopPropagation();
+        const nm=it.getAttribute("data-name");
+        P().dishLibrary=P().dishLibrary.filter(d=>d.name!==nm);
+        P().wishlist=P().wishlist.filter(w=>w.name!==nm);
+        save(); renderWish(); showDishSuggest();
+      });
+    });
   }
   $("dishName").addEventListener("input",showDishSuggest);
   $("dishName").addEventListener("focus",showDishSuggest);
