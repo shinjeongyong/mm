@@ -64,7 +64,7 @@
   .daynum.today{background:var(--green);color:#fff;}
   body.kids .daynum.today{background:var(--kid);}
   .daynum.sun{color:var(--sun);} .daynum.sat{color:var(--sat);}
-  .preview{font-size:11px;line-height:1.3;color:var(--sub);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .preview{font-size:11px;line-height:1.3;color:var(--sub);margin-top:3px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
   .cards{margin-top:26px;display:grid;gap:14px;}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 18px;}
@@ -109,9 +109,14 @@
   .pill.kids{background:var(--kid-soft);color:var(--kid);}
   .closebtn{border:none;background:none;cursor:pointer;color:var(--sub);font-size:24px;line-height:1;padding:0 2px;}
   .flabel{font-size:13px;font-weight:700;color:var(--sub);display:block;margin-bottom:9px;}
-  .hint{font-size:12px;color:var(--sub);margin:-4px 0 9px;}
+  .hint{font-size:12px;color:var(--sub);}
 
-  .dishlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+  .meal-group{margin-bottom:12px;}
+  .meal-label{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:7px;}
+  .meal-empty{font-size:12px;color:var(--sub);padding:0 0 2px 2px;}
+  .dishlist{display:flex;flex-direction:column;gap:8px;margin-bottom:0;}
+  .meal-group .dishlist{margin-bottom:0;}
+  .mg-list{display:flex;flex-direction:column;gap:8px;}
   .dish{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 10px 9px 13px;flex-wrap:wrap;}
   .dish-name{font-size:15px;font-weight:700;}
   .recipe{display:inline-flex;align-items:center;gap:6px;background:var(--honey-soft);color:var(--honey);border:1px solid var(--honey-line);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600;text-decoration:none;}
@@ -119,8 +124,14 @@
   .mini{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;white-space:nowrap;}
   .mini:active{background:var(--bg);}
   .mini.save{margin-left:8px;background:var(--green);color:#fff;border-color:var(--green);}
+  .meal-sel{border:1px solid var(--line);border-radius:8px;padding:5px 6px;font-size:12px;font-family:inherit;color:var(--sub);background:#fff;cursor:pointer;}
   .dish-del{border:none;background:none;cursor:pointer;color:var(--sub);font-size:18px;line-height:1;padding:0 2px;}
   .dish-urledit{flex:1 1 100%;margin-top:6px;}
+
+  .meal-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  .mp{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 4px;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;}
+  .mp.active{background:var(--green-soft);color:var(--green);border-color:transparent;}
+  body.kids .mp.active{background:var(--kid-soft);color:var(--kid);}
 
   .done{margin-top:22px;width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
   .done:active{background:var(--green-dark);}
@@ -192,7 +203,7 @@
       <div class="card-head"><span style="font-size:18px;">🍽️</span><h2>먹고싶은 메뉴</h2><span class="count w" id="wishCount">0</span></div>
       <p class="hint" style="margin:-6px 0 12px;">여기 담아두면, 날짜에 요리 등록할 때 ⭐ 추천으로 떠서 바로 넣을 수 있어요.</p>
       <div id="wishItems" class="dishlist"></div>
-      <div class="suggest"><input class="field" id="wishName" placeholder="먹고싶은 요리 이름" autocomplete="off" /><div id="wishSuggest" class="suggest-box hidden"></div></div>
+      <div class="suggest" style="margin-top:8px;"><input class="field" id="wishName" placeholder="먹고싶은 요리 이름" autocomplete="off" /><div id="wishSuggest" class="suggest-box hidden"></div></div>
       <div class="addrow mt8">
         <input class="field" id="wishUrl" placeholder="레시피 주소 (선택)" />
         <button class="addbtn wish" id="wishAdd">+ 추가</button>
@@ -209,9 +220,15 @@
       <div class="sheet-title" id="sheetTitle"></div>
       <button class="closebtn" id="closeBtn" aria-label="닫기">×</button>
     </div>
-    <label class="flabel">요리 (하나씩 등록 · 각 요리에 레시피 링크)</label>
-    <div id="dishList" class="dishlist"></div>
-    <div class="suggest"><input class="field" id="dishName" placeholder="요리 이름 (⭐ 먹고싶은 메뉴도 추천돼요)" autocomplete="off" /><div id="dishSuggest" class="suggest-box hidden"></div></div>
+    <div id="dishList"></div>
+    <label class="flabel" style="margin-top:6px;">요리 추가</label>
+    <div class="meal-picker" id="mealPicker">
+      <button type="button" class="mp" data-m="breakfast">🌅 아침</button>
+      <button type="button" class="mp" data-m="lunch">☀️ 점심</button>
+      <button type="button" class="mp active" data-m="dinner">🌙 저녁</button>
+      <button type="button" class="mp" data-m="snack">🍪 간식</button>
+    </div>
+    <div class="suggest" style="margin-top:8px;"><input class="field" id="dishName" placeholder="요리 이름 (⭐ 먹고싶은 메뉴도 추천돼요)" autocomplete="off" /><div id="dishSuggest" class="suggest-box hidden"></div></div>
     <div class="addrow mt8">
       <input class="field" id="dishUrl" placeholder="레시피 주소 (선택)" />
       <button class="addbtn" id="dishAdd">+ 추가</button>
@@ -243,6 +260,9 @@
 
   const WEEKDAYS = ["일","월","화","수","목","금","토"];
   const PLAN_LABEL = { adult:"성인", kids:"유아식" };
+  const MEAL_ORDER = ["breakfast","lunch","dinner","snack"];
+  const MEAL_LABEL = { breakfast:"🌅 아침", lunch:"☀️ 점심", dinner:"🌙 저녁", snack:"🍪 간식" };
+  const MEAL_SHORT = { breakfast:"아침", lunch:"점심", dinner:"저녁", snack:"간식" };
   const $ = (id) => document.getElementById(id);
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   const keyOf = (y,m,d) => y + "-" + (m+1) + "-" + d;
@@ -252,7 +272,7 @@
   const blankPlan = () => ({ meals:{}, dishLibrary:[], have:[], buy:[], ingredientLibrary:[], wishlist:[] });
   let state = { plans:{ adult:blankPlan(), kids:blankPlan() } };
   let currentPlan = "adult";
-  let currentUser = null, saveTimer = null, selKey = null, editDishId = null, editWishId = null;
+  let currentUser = null, saveTimer = null, selKey = null, editDishId = null, editWishId = null, addMeal = "dinner";
   const today = new Date();
   let vy = today.getFullYear(), vm = today.getMonth();
 
@@ -295,10 +315,11 @@
         if(!e.dishes){
           e.dishes=[];
           if(e.menu && e.menu.trim()){
-            e.menu.split(",").map(s=>s.trim()).filter(Boolean).forEach((nm,idx)=> e.dishes.push({id:uid(),name:nm,url:(idx===0&&e.recipes&&e.recipes[0])?e.recipes[0].url:""}));
+            e.menu.split(",").map(s=>s.trim()).filter(Boolean).forEach((nm,idx)=> e.dishes.push({id:uid(),name:nm,url:(idx===0&&e.recipes&&e.recipes[0])?e.recipes[0].url:"",meal:"dinner"}));
           }
           delete e.menu; delete e.recipes;
         }
+        (e.dishes||[]).forEach(d=>{ if(!d.meal) d.meal="dinner"; });
       });
       Object.values(pl.meals).forEach(e=> (e.dishes||[]).forEach(d=> upsertDish(key,d.name,d.url)));
       pl.have.concat(pl.buy).forEach(i=> upsertIngredient(key,i.name));
@@ -349,7 +370,11 @@
       const k=keyOf(vy,vm,d), dow=(firstDow+d-1)%7, isT=thisMonth&&d===today.getDate();
       const numCls="daynum"+(isT?" today":(dow===0?" sun":(dow===6?" sat":"")));
       const e=meals[k]; let inner="";
-      if(e && e.dishes && e.dishes.length) inner='<span class="preview">'+esc(e.dishes.map(x=>x.name).join(" · "))+'</span>';
+      if(e && e.dishes && e.dishes.length){
+        const ordered=[];
+        for(const meal of MEAL_ORDER) e.dishes.filter(x=>(x.meal||"dinner")===meal).forEach(x=>ordered.push(x.name));
+        inner='<span class="preview">'+esc(ordered.join(" · "))+'</span>';
+      }
       h+='<button class="cell" data-key="'+k+'"><span><span class="'+numCls+'">'+d+'</span></span>'+inner+'</button>';
     }
     let total=firstDow+days; while(total%7!==0){ h+='<div class="cell blank"></div>'; total++; }
@@ -435,7 +460,6 @@
   function removeWish(id){ const a=P(); a.wishlist=a.wishlist.filter(w=>w.id!==id); save(); renderWish(); }
   function saveWishUrl(id,raw){ const w=P().wishlist.find(x=>x.id===id); if(!w) return; w.url=normUrl(raw); editWishId=null; save(); renderWish(); }
 
-  // 먹고싶은 메뉴 입력창: 만든 적 있는 요리 자동추천(이름+링크 채움)
   $("wishName").addEventListener("input",()=>{
     const v=$("wishName").value.trim().toLowerCase();
     if(!v){ hideSuggest("wishSuggest"); return; }
@@ -455,9 +479,13 @@
   $("wishUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addWish(); });
   $("wishAdd").addEventListener("click",addWish);
 
-  // ── 날짜 편집(요리 단위) ──
+  // ── 날짜 편집(끼니 × 요리 단위) ──
+  function setMealPicker(m){
+    addMeal=m;
+    $("mealPicker").querySelectorAll(".mp").forEach(x=>x.classList.toggle("active", x.getAttribute("data-m")===m));
+  }
   function openSheet(k){
-    selKey=k; editDishId=null;
+    selKey=k; editDishId=null; setMealPicker("dinner");
     const p=k.split("-"), y=+p[0], mo=+p[1]-1, d=+p[2];
     const pillCls = currentPlan==="kids"?"kids":"adult";
     $("sheetTitle").innerHTML=(mo+1)+"월 "+d+"일 <span>("+WEEKDAYS[new Date(y,mo,d).getDay()]+")</span>"
@@ -469,31 +497,39 @@
   function closeSheet(){ $("overlay").classList.remove("show"); selKey=null; editDishId=null; }
   function ensureEntry(k){ const m=P().meals; if(!m[k]) m[k]={dishes:[]}; if(!m[k].dishes) m[k].dishes=[]; return m[k]; }
 
+  function dishRowHtml(d){
+    if(editDishId===d.id){
+      return '<div class="dish"><span class="dish-name">'+esc(d.name)+'</span>'
+        +'<input class="field dish-urledit" data-id="'+d.id+'" value="'+esc(d.url||"")+'" placeholder="레시피 주소" />'
+        +'<button class="mini save" data-save="'+d.id+'">저장</button></div>';
+    }
+    const recipe=d.url?'<a class="recipe" href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">↗ 레시피</a>':'';
+    const linkBtn='<button class="mini" data-editlink="'+d.id+'">'+(d.url?"링크 수정":"+ 링크")+'</button>';
+    let opts=""; for(const m of MEAL_ORDER) opts+='<option value="'+m+'"'+((d.meal||"dinner")===m?" selected":"")+'>'+MEAL_SHORT[m]+'</option>';
+    const sel='<select class="meal-sel" data-mealsel="'+d.id+'" title="끼니 이동">'+opts+'</select>';
+    return '<div class="dish"><span class="dish-name">'+esc(d.name)+'</span>'+recipe+linkBtn+sel+'<button class="dish-del" data-del="'+d.id+'" aria-label="삭제">×</button></div>';
+  }
   function renderDishes(){
-    const e=entryOf(selKey), box=$("dishList");
-    if(!e.dishes || e.dishes.length===0){ box.innerHTML='<div class="empty-note" style="margin:0 0 4px;">아직 등록한 요리가 없어요.</div>'; return; }
+    const e=entryOf(selKey), box=$("dishList"), dishes=e.dishes||[];
     let h="";
-    for(const d of e.dishes){
-      if(editDishId===d.id){
-        h+='<div class="dish"><span class="dish-name">'+esc(d.name)+'</span>'
-          +'<input class="field dish-urledit" data-id="'+d.id+'" value="'+esc(d.url||"")+'" placeholder="레시피 주소" />'
-          +'<button class="mini save" data-save="'+d.id+'">저장</button></div>';
-      }else{
-        const recipe=d.url?'<a class="recipe" href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">↗ 레시피</a>':'';
-        const linkBtn='<button class="mini" data-editlink="'+d.id+'">'+(d.url?"링크 수정":"+ 링크")+'</button>';
-        h+='<div class="dish"><span class="dish-name">'+esc(d.name)+'</span>'+recipe+linkBtn+'<button class="dish-del" data-del="'+d.id+'" aria-label="삭제">×</button></div>';
-      }
+    for(const meal of MEAL_ORDER){
+      const list=dishes.filter(d=>(d.meal||"dinner")===meal);
+      h+='<div class="meal-group"><div class="meal-label">'+MEAL_LABEL[meal]+'</div>';
+      if(!list.length) h+='<div class="meal-empty">아직 없어요</div>';
+      else { h+='<div class="mg-list">'; for(const d of list) h+=dishRowHtml(d); h+='</div>'; }
+      h+='</div>';
     }
     box.innerHTML=h;
     box.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>removeDish(b.getAttribute("data-del"))));
     box.querySelectorAll("[data-editlink]").forEach(b=>b.addEventListener("click",()=>{ editDishId=b.getAttribute("data-editlink"); renderDishes(); const i=box.querySelector('.dish-urledit[data-id="'+editDishId+'"]'); if(i) i.focus(); }));
     box.querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",()=>{ const id=b.getAttribute("data-save"); const i=box.querySelector('.dish-urledit[data-id="'+id+'"]'); saveDishUrl(id, i?i.value:""); }));
     box.querySelectorAll(".dish-urledit").forEach(i=>i.addEventListener("keydown",e=>{ if(e.key==="Enter") saveDishUrl(i.getAttribute("data-id"), i.value); }));
+    box.querySelectorAll("[data-mealsel]").forEach(s=>s.addEventListener("change",()=>moveDishMeal(s.getAttribute("data-mealsel"), s.value)));
   }
   function addDish(){
     const name=$("dishName").value.trim(); if(!name) return;
     const url=normUrl($("dishUrl").value);
-    const e=ensureEntry(selKey); e.dishes.push({id:uid(),name,url});
+    const e=ensureEntry(selKey); e.dishes.push({id:uid(),name,url,meal:addMeal});
     upsertDish(currentPlan,name,url);
     $("dishName").value=""; $("dishUrl").value=""; hideSuggest("dishSuggest");
     save(); renderDishes(); renderCalendar();
@@ -505,8 +541,13 @@
     d.url=normUrl(raw); upsertDish(currentPlan,d.name,d.url); editDishId=null;
     save(); renderDishes(); renderCalendar();
   }
+  function moveDishMeal(id,meal){
+    const e=P().meals[selKey]; if(!e||!e.dishes) return;
+    const d=e.dishes.find(x=>x.id===id); if(!d) return;
+    d.meal=meal; save(); renderDishes(); renderCalendar();
+  }
 
-  // 요리 등록 추천: 만든요리(dishLibrary) + 먹고싶은메뉴(wishlist), 빈칸이면 먹고싶은메뉴만
+  // 요리 등록 추천: 만든요리 + 먹고싶은메뉴(⭐), 빈칸이면 먹고싶은메뉴만
   function getDishSuggestions(q){
     const map=new Map();
     for(const d of P().dishLibrary) map.set(d.name,{name:d.name,url:d.url||"",wish:false});
@@ -530,8 +571,8 @@
     box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",ev=>{
       ev.preventDefault();
       const nm=it.getAttribute("data-name"), u=it.getAttribute("data-url");
-      const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u}); upsertDish(currentPlan,nm,u);
-      $("dishName").value=""; $("dishUrl").value=""; 
+      const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u,meal:addMeal}); upsertDish(currentPlan,nm,u);
+      $("dishName").value=""; $("dishUrl").value="";
       save(); renderDishes(); renderCalendar(); $("dishName").focus(); showDishSuggest();
     }));
   }
@@ -541,6 +582,7 @@
   $("dishName").addEventListener("keydown",e=>{ if(e.key==="Enter") addDish(); });
   $("dishUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addDish(); });
   $("dishAdd").addEventListener("click",addDish);
+  $("mealPicker").querySelectorAll(".mp").forEach(b=> b.addEventListener("click",()=>setMealPicker(b.getAttribute("data-m"))));
 
   // 식단 전환
   function switchPlan(plan){
