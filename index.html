@@ -57,14 +57,14 @@
   .dow{text-align:center;font-size:12px;font-weight:700;padding:2px 0;color:var(--sub);}
   .dow.s{color:var(--sun);} .dow.t{color:var(--sat);}
   .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .cell{background:#fff;border:1px solid var(--line);border-radius:12px;min-height:66px;padding:6px 6px 5px;display:flex;flex-direction:column;cursor:pointer;overflow:hidden;text-align:left;font-family:inherit;}
+  .cell{background:#fff;border:1px solid var(--line);border-radius:12px;min-height:88px;padding:7px 7px 6px;display:flex;flex-direction:column;cursor:pointer;overflow:hidden;text-align:left;font-family:inherit;}
   .cell:active{border-color:var(--green);}
   .cell.blank{background:transparent;border-color:transparent;cursor:default;}
   .daynum{font-size:13px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
   .daynum.today{background:var(--green);color:#fff;}
   body.kids .daynum.today{background:var(--kid);}
   .daynum.sun{color:var(--sun);} .daynum.sat{color:var(--sat);}
-  .preview{font-size:11px;line-height:1.3;color:var(--sub);margin-top:3px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .preview{font-size:12px;line-height:1.38;color:#57625B;margin-top:4px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
 
   .cards{margin-top:26px;display:grid;gap:14px;}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 16px 18px;}
@@ -139,7 +139,14 @@
   .done{margin-top:22px;width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
   .done:active{background:var(--green-dark);}
   .mt8{margin-top:8px;}
-  @media (max-width:520px){ .cell{min-height:60px;} }
+  @media (max-width:520px){ .cell{min-height:78px;} }
+
+  .ing-group{margin-bottom:12px;}
+  .ing-group .items{margin-bottom:0;}
+  .ing-group:last-child{margin-bottom:0;}
+  .ing-label{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:8px;}
+  .ing-label .ing-n{color:var(--sub);font-weight:700;margin-left:2px;}
+  .cat-sel{border:1px solid var(--line);border-radius:7px;padding:2px 4px;font-size:11px;font-family:inherit;color:var(--sub);background:#fff;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -266,6 +273,23 @@
   const MEAL_ORDER = ["breakfast","lunch","dinner","snack"];
   const MEAL_LABEL = { breakfast:"🌅 아침", lunch:"☀️ 점심", dinner:"🌙 저녁", snack:"🍪 간식" };
   const MEAL_SHORT = { breakfast:"아침", lunch:"점심", dinner:"저녁", snack:"간식" };
+  const CAT_ORDER = ["meat","seafood","veg","tofu","hmr","etc"];
+  const CAT_LABEL = { meat:"🥩 육류", seafood:"🐟 수산물", veg:"🥬 채소", tofu:"🧀 두부·유제품·계란", hmr:"🍱 간편식·냉동", etc:"🧂 기타" };
+  const CAT_SHORT = { meat:"육류", seafood:"수산물", veg:"채소", tofu:"두부·유제품", hmr:"간편식", etc:"기타" };
+  const CAT_KW = {
+    hmr:["비비고","수제","동그랑땡","만두","떡갈비","미트볼","돈까스","돈까쓰","까스","까쓰","너겟","너깃","핫도그","피자","밀키트","즉석","레토르트","그라탕","그라탱","육개장","스푸드립","죽","볶음밥","국밥","1팩","2팩","3팩","팩","찌개","전골","탕"],
+    meat:["삼겹살","목살","돼지","소고기","한우","닭","안심","등심","갈비","베이컨","햄","소시지","차돌","항정살","앞다리","뒷다리","우삼겹","양지","사태","불고기","제육","목전지","다짐육","간고기","LA갈비","la갈비"],
+    seafood:["바지락","조기","고등어","갈치","오징어","새우","장어","연어","광어","문어","전복","홍합","멸치","명태","코다리","골뱅이","꽃게","가리비","굴","낙지","주꾸미","쭈꾸미","동태","황태","임연수","가자미","조개","해물","어묵","맛살"],
+    veg:["양파","대파","마늘","고추","애호박","양송이","버섯","시금치","배추","무","당근","감자","고구마","오이","호박","상추","깻잎","브로콜리","콩나물","숙주","가지","파프리카","쪽파","부추","미나리","청경채","셀러리","토마토","단호박","고사리","도라지","연근","우엉","팽이","느타리","표고"],
+    tofu:["두부","순두부","치즈","우유","계란","달걀","요거트","버터","생크림","모짜렐라","리코타","연두부","유부"]
+  };
+  function guessCategory(name){
+    const n=(name||"").toLowerCase();
+    for(const cat of ["hmr","meat","seafood","tofu","veg"]){
+      if(CAT_KW[cat].some(k=>n.includes(k.toLowerCase()))) return cat;
+    }
+    return "etc";
+  }
   const $ = (id) => document.getElementById(id);
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
   const keyOf = (y,m,d) => y + "-" + (m+1) + "-" + d;
@@ -304,6 +328,7 @@
         }, kids:blankPlan() } };
       } else { state = { plans:{ adult:blankPlan(), kids:blankPlan() } }; }
     }
+    if(!state.categoryMap) state.categoryMap={};
     for(const key of ["adult","kids"]){
       if(!state.plans[key]) state.plans[key]=blankPlan();
       const pl=state.plans[key];
@@ -313,6 +338,8 @@
       if(!pl.buy) pl.buy=[];
       if(!pl.ingredientLibrary) pl.ingredientLibrary=[];
       if(!pl.wishlist) pl.wishlist=[];
+      pl.have.forEach(i=>{ if(!i.cat) i.cat=state.categoryMap[i.name]||guessCategory(i.name); });
+      pl.buy.forEach(i=>{ if(!i.cat) i.cat=state.categoryMap[i.name]||guessCategory(i.name); });
       Object.keys(pl.meals).forEach(k=>{
         const e=pl.meals[k]; if(!e) return;
         if(!e.dishes){
@@ -390,18 +417,32 @@
     const arr=P()[listName]; $(countId).textContent=arr.length;
     const box=$(containerId);
     if(arr.length===0){ box.className="empty-note"; box.innerHTML="아직 없어요. 아래에 추가해 보세요."; return; }
-    box.className="items"; let h="";
-    for(const it of arr){
-      const moveBtn=withMove?'<button class="move" data-move="'+it.id+'" title="샀어요 → 현재 있는 식재료로">→</button>':'';
-      h+='<span class="chip">'+esc(it.name)+moveBtn+'<button class="del" data-list="'+listName+'" data-del="'+it.id+'" aria-label="삭제">×</button></span>';
+    box.className=""; let h="";
+    for(const cat of CAT_ORDER){
+      const list=arr.filter(it=>(it.cat||"etc")===cat);
+      if(!list.length) continue;
+      h+='<div class="ing-group"><div class="ing-label">'+CAT_LABEL[cat]+' <span class="ing-n">'+list.length+'</span></div><div class="items">';
+      for(const it of list){
+        const moveBtn=withMove?'<button class="move" data-move="'+it.id+'" title="샀어요 → 현재 있는 식재료로">→</button>':'';
+        let opts=""; for(const c of CAT_ORDER) opts+='<option value="'+c+'"'+((it.cat||"etc")===c?" selected":"")+'>'+CAT_SHORT[c]+'</option>';
+        const sel='<select class="cat-sel" data-catsel="'+it.id+'" data-list="'+listName+'" title="분류 바꾸기">'+opts+'</select>';
+        h+='<span class="chip">'+esc(it.name)+sel+moveBtn+'<button class="del" data-list="'+listName+'" data-del="'+it.id+'" aria-label="삭제">×</button></span>';
+      }
+      h+='</div></div>';
     }
     box.innerHTML=h;
     box.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>removeItem(b.getAttribute("data-list"),b.getAttribute("data-del"))));
     if(withMove) box.querySelectorAll("[data-move]").forEach(b=>b.addEventListener("click",()=>moveToHave(b.getAttribute("data-move"))));
+    box.querySelectorAll("[data-catsel]").forEach(s=>s.addEventListener("change",()=>changeItemCat(s.getAttribute("data-list"),s.getAttribute("data-catsel"),s.value)));
+  }
+  function changeItemCat(listName,id,cat){
+    const it=P()[listName].find(x=>x.id===id); if(!it) return;
+    it.cat=cat; state.categoryMap[it.name]=cat; save(); renderItems();
   }
   function addItem(listName,inputId,boxId){
     const el=$(inputId); const name=el.value.trim(); if(!name) return;
-    P()[listName].push({id:uid(),name}); upsertIngredient(currentPlan,name);
+    const cat=state.categoryMap[name]||guessCategory(name);
+    P()[listName].push({id:uid(),name,cat}); upsertIngredient(currentPlan,name);
     el.value=""; hideSuggest(boxId); save(); renderItems();
   }
   function removeItem(listName,id){ const a=P(); a[listName]=a[listName].filter(i=>i.id!==id); save(); renderItems(); }
@@ -425,7 +466,8 @@
       box.querySelectorAll(".suggest-item").forEach(it=>{
         it.addEventListener("mousedown",e=>{
           e.preventDefault();
-          P()[listName].push({id:uid(),name:it.getAttribute("data-name")});
+          const nm=it.getAttribute("data-name");
+          P()[listName].push({id:uid(),name:nm,cat:state.categoryMap[nm]||guessCategory(nm)});
           inp.value=""; hideSuggest(boxId); save(); renderItems(); inp.focus();
         });
         it.querySelector(".si-del").addEventListener("mousedown",e=>{
