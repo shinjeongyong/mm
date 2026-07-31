@@ -141,6 +141,22 @@
   .mt8{margin-top:8px;}
   @media (max-width:520px){ .cell{min-height:78px;} }
 
+  .dash{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px 8px;margin-bottom:16px;cursor:pointer;}
+  .dash:active{background:#FCFDFB;}
+  .dash-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .dash-title{font-size:14px;font-weight:800;}
+  .dash-title b{color:var(--sub);font-weight:700;margin-left:2px;}
+  .dash .pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;}
+  .dash-edit{margin-left:auto;font-size:11px;color:var(--sub);font-weight:600;white-space:nowrap;}
+  .dash-row{display:flex;gap:10px;padding:7px 0;align-items:baseline;}
+  .dash-row + .dash-row{border-top:1px solid var(--line);}
+  .dash-meal{flex:0 0 60px;font-size:13px;font-weight:700;color:var(--ink);}
+  .dash-dishes{flex:1;font-size:13px;color:var(--ink);line-height:1.5;}
+  .dash-empty{color:var(--sub);}
+  .dash-dot{color:var(--line);margin:0 5px;}
+  .dash-dish{white-space:nowrap;}
+  .dash-link{color:var(--honey);text-decoration:none;font-weight:800;margin-left:3px;}
+
   .ing-group{margin-bottom:12px;}
   .ing-group .items{margin-bottom:0;}
   .ing-group:last-child{margin-bottom:0;}
@@ -182,6 +198,8 @@
     <button class="plan-tab active" data-plan="adult">🍚 성인</button>
     <button class="plan-tab" data-plan="kids">🍼 유아식</button>
   </div>
+
+  <div id="todayDash" class="dash"></div>
 
   <div class="monthbar">
     <button class="navbtn" id="prevBtn" aria-label="이전 달">‹</button>
@@ -413,6 +431,24 @@
     let total=firstDow+days; while(total%7!==0){ h+='<div class="cell blank"></div>'; total++; }
     const grid=$("grid"); grid.innerHTML=h;
     grid.querySelectorAll(".cell[data-key]").forEach(c=> c.addEventListener("click",()=>openSheet(c.getAttribute("data-key"))));
+    renderDash();
+  }
+
+  function renderDash(){
+    const box=$("todayDash"); if(!box) return;
+    const tk=keyOf(today.getFullYear(),today.getMonth(),today.getDate());
+    const e=P().meals[tk]; const dishes=(e&&e.dishes)||[];
+    const dow=WEEKDAYS[today.getDay()];
+    const pillCls=currentPlan==="kids"?"kids":"adult";
+    let rows="";
+    for(const meal of MEAL_ORDER){
+      const list=dishes.filter(d=>(d.meal||"dinner")===meal);
+      let content;
+      if(!list.length) content='<span class="dash-empty">—</span>';
+      else content=list.map(d=>'<span class="dash-dish">'+esc(d.name)+(d.url?'<a class="dash-link" href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer" title="레시피">↗</a>':'')+'</span>').join('<span class="dash-dot">·</span>');
+      rows+='<div class="dash-row"><span class="dash-meal">'+MEAL_LABEL[meal]+'</span><span class="dash-dishes">'+content+'</span></div>';
+    }
+    box.innerHTML='<div class="dash-head"><span class="dash-title">오늘 · '+(today.getMonth()+1)+'월 '+today.getDate()+'일 <b>'+dow+'</b></span><span class="pill '+pillCls+'">'+PLAN_LABEL[currentPlan]+'</span><span class="dash-edit">탭하여 편집</span></div>'+rows;
   }
 
   function renderItems(){ renderList("have","haveItems","haveCount",false); renderList("buy","buyItems","buyCount",true); }
@@ -662,6 +698,7 @@
     renderCalendar(); renderItems(); renderWish();
   }
   document.querySelectorAll(".plan-tab").forEach(t=> t.addEventListener("click",()=> switchPlan(t.getAttribute("data-plan"))));
+  $("todayDash").addEventListener("click",e=>{ if(e.target.closest(".dash-link")) return; openSheet(keyOf(today.getFullYear(),today.getMonth(),today.getDate())); });
 
   $("prevBtn").addEventListener("click",()=>{ const n=new Date(vy,vm-1,1); vy=n.getFullYear(); vm=n.getMonth(); renderCalendar(); });
   $("nextBtn").addEventListener("click",()=>{ const n=new Date(vy,vm+1,1); vy=n.getFullYear(); vm=n.getMonth(); renderCalendar(); });
