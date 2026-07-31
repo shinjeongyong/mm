@@ -147,6 +147,8 @@
   .ing-label{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:8px;}
   .ing-label .ing-n{color:var(--sub);font-weight:700;margin-left:2px;}
   .cat-sel{border:1px solid var(--line);border-radius:7px;padding:2px 4px;font-size:11px;font-family:inherit;color:var(--sub);background:#fff;cursor:pointer;}
+  .cat-edit-btn{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .cat-edit-btn.on{background:var(--green-soft);color:var(--green);border-color:transparent;}
 </style>
 </head>
 <body>
@@ -192,7 +194,7 @@
 
   <div class="cards">
     <div class="card">
-      <div class="card-head"><span style="font-size:18px;">🧺</span><h2>현재 있는 식재료</h2><span class="count g" id="haveCount">0</span></div>
+      <div class="card-head"><span style="font-size:18px;">🧺</span><h2>현재 있는 식재료</h2><button class="cat-edit-btn" id="haveCatEdit" data-list="have">분류 바꾸기</button><span class="count g" id="haveCount">0</span></div>
       <div class="items" id="haveItems"></div>
       <div class="addrow">
         <div class="suggest"><input class="field" id="haveInput" placeholder="식재료 이름" autocomplete="off" /><div id="haveSuggest" class="suggest-box hidden"></div></div>
@@ -201,7 +203,7 @@
     </div>
 
     <div class="card">
-      <div class="card-head"><span style="font-size:18px;">🛒</span><h2>구입할 식재료</h2><span class="count h" id="buyCount">0</span></div>
+      <div class="card-head"><span style="font-size:18px;">🛒</span><h2>구입할 식재료</h2><button class="cat-edit-btn" id="buyCatEdit" data-list="buy">분류 바꾸기</button><span class="count h" id="buyCount">0</span></div>
       <div class="items" id="buyItems"></div>
       <div class="addrow">
         <div class="suggest"><input class="field" id="buyInput" placeholder="식재료 이름" autocomplete="off" /><div id="buySuggest" class="suggest-box hidden"></div></div>
@@ -300,6 +302,7 @@
   let state = { plans:{ adult:blankPlan(), kids:blankPlan() } };
   let currentPlan = "adult";
   let currentUser = null, saveTimer = null, selKey = null, editDishId = null, editWishId = null, addMeal = "dinner";
+  const catEdit = { have:false, buy:false };
   const today = new Date();
   let vy = today.getFullYear(), vm = today.getMonth();
 
@@ -424,8 +427,11 @@
       h+='<div class="ing-group"><div class="ing-label">'+CAT_LABEL[cat]+' <span class="ing-n">'+list.length+'</span></div><div class="items">';
       for(const it of list){
         const moveBtn=withMove?'<button class="move" data-move="'+it.id+'" title="샀어요 → 현재 있는 식재료로">→</button>':'';
-        let opts=""; for(const c of CAT_ORDER) opts+='<option value="'+c+'"'+((it.cat||"etc")===c?" selected":"")+'>'+CAT_SHORT[c]+'</option>';
-        const sel='<select class="cat-sel" data-catsel="'+it.id+'" data-list="'+listName+'" title="분류 바꾸기">'+opts+'</select>';
+        let sel="";
+        if(catEdit[listName]){
+          let opts=""; for(const c of CAT_ORDER) opts+='<option value="'+c+'"'+((it.cat||"etc")===c?" selected":"")+'>'+CAT_SHORT[c]+'</option>';
+          sel='<select class="cat-sel" data-catsel="'+it.id+'" data-list="'+listName+'" title="분류 바꾸기">'+opts+'</select>';
+        }
         h+='<span class="chip">'+esc(it.name)+sel+moveBtn+'<button class="del" data-list="'+listName+'" data-del="'+it.id+'" aria-label="삭제">×</button></span>';
       }
       h+='</div></div>';
@@ -669,6 +675,15 @@
   $("overlay").addEventListener("click",e=>{ if(e.target===$("overlay")) closeSheet(); });
   wireIngredientSuggest("haveInput","haveSuggest","have");
   wireIngredientSuggest("buyInput","buySuggest","buy");
+  function toggleCatEdit(list){
+    catEdit[list]=!catEdit[list];
+    const btn=$(list==="have"?"haveCatEdit":"buyCatEdit");
+    btn.textContent=catEdit[list]?"완료":"분류 바꾸기";
+    btn.classList.toggle("on",catEdit[list]);
+    renderItems();
+  }
+  $("haveCatEdit").addEventListener("click",()=>toggleCatEdit("have"));
+  $("buyCatEdit").addEventListener("click",()=>toggleCatEdit("buy"));
 
   $("googleLoginBtn").addEventListener("click",async ()=>{
     $("loginError").textContent="";
