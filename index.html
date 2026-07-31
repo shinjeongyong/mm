@@ -13,6 +13,7 @@
     --green:#3E6B4E; --green-dark:#345C42; --green-soft:#EAF1EA;
     --honey:#CE8524; --honey-soft:#FBEFD9; --honey-line:#F0DCB4;
     --kid:#4A7A9E; --kid-soft:#E7EFF4;
+    --wish:#8A5AA8; --wish-soft:#F1E9F6;
     --sun:#C0563E; --sat:#3E6B8E;
     --font:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   }
@@ -72,6 +73,7 @@
   .count{margin-left:auto;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;}
   .count.g{color:var(--green);background:var(--green-soft);}
   .count.h{color:var(--honey);background:var(--honey-soft);}
+  .count.w{color:var(--wish);background:var(--wish-soft);}
   .items{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:13px;}
   .chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 13px;font-size:14px;font-weight:600;}
   .chip .move{border:none;background:var(--honey-soft);color:var(--honey);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1;}
@@ -83,16 +85,17 @@
   .addbtn{display:flex;align-items:center;justify-content:center;gap:5px;background:var(--green);color:#fff;border:none;border-radius:10px;padding:10px 15px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
   .addbtn:active{background:var(--green-dark);}
   .addbtn.honey{background:var(--honey);}
+  .addbtn.wish{background:var(--wish);}
 
   .foot{text-align:center;font-size:12px;color:var(--sub);margin-top:24px;line-height:1.6;}
   #saveStatus{font-weight:700;}
   #saveStatus.saved{color:var(--green);} #saveStatus.pending{color:var(--honey);}
 
   .suggest{position:relative;flex:1;}
-  .suggest-box{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:20;overflow:hidden;max-height:220px;overflow-y:auto;}
+  .suggest-box{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:20;overflow:hidden;max-height:240px;overflow-y:auto;}
   .suggest-item{padding:10px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;}
   .suggest-item:active{background:var(--green-soft);}
-  .suggest-item .u{margin-left:auto;font-size:11px;color:var(--honey);font-weight:700;}
+  .suggest-item .u{margin-left:auto;font-size:11px;color:var(--honey);font-weight:700;white-space:nowrap;}
 
   .overlay{position:fixed;inset:0;background:rgba(30,40,32,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .overlay.show{display:flex;}
@@ -106,6 +109,7 @@
   .pill.kids{background:var(--kid-soft);color:var(--kid);}
   .closebtn{border:none;background:none;cursor:pointer;color:var(--sub);font-size:24px;line-height:1;padding:0 2px;}
   .flabel{font-size:13px;font-weight:700;color:var(--sub);display:block;margin-bottom:9px;}
+  .hint{font-size:12px;color:var(--sub);margin:-4px 0 9px;}
 
   .dishlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
   .dish{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 10px 9px 13px;flex-wrap:wrap;}
@@ -183,6 +187,17 @@
         <button class="addbtn honey" id="buyAdd">+ 추가</button>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-head"><span style="font-size:18px;">🍽️</span><h2>먹고싶은 메뉴</h2><span class="count w" id="wishCount">0</span></div>
+      <p class="hint" style="margin:-6px 0 12px;">여기 담아두면, 날짜에 요리 등록할 때 ⭐ 추천으로 떠서 바로 넣을 수 있어요.</p>
+      <div id="wishItems" class="dishlist"></div>
+      <div class="suggest"><input class="field" id="wishName" placeholder="먹고싶은 요리 이름" autocomplete="off" /><div id="wishSuggest" class="suggest-box hidden"></div></div>
+      <div class="addrow mt8">
+        <input class="field" id="wishUrl" placeholder="레시피 주소 (선택)" />
+        <button class="addbtn wish" id="wishAdd">+ 추가</button>
+      </div>
+    </div>
   </div>
 
   <p class="foot">허용된 사람끼리 같은 식단을 공유해요. · <span id="saveStatus" class="saved">저장됨</span></p>
@@ -196,7 +211,7 @@
     </div>
     <label class="flabel">요리 (하나씩 등록 · 각 요리에 레시피 링크)</label>
     <div id="dishList" class="dishlist"></div>
-    <div class="suggest"><input class="field" id="dishName" placeholder="요리 이름 (예: 된장찌개)" autocomplete="off" /><div id="dishSuggest" class="suggest-box hidden"></div></div>
+    <div class="suggest"><input class="field" id="dishName" placeholder="요리 이름 (⭐ 먹고싶은 메뉴도 추천돼요)" autocomplete="off" /><div id="dishSuggest" class="suggest-box hidden"></div></div>
     <div class="addrow mt8">
       <input class="field" id="dishUrl" placeholder="레시피 주소 (선택)" />
       <button class="addbtn" id="dishAdd">+ 추가</button>
@@ -224,8 +239,6 @@
   const auth = getAuth(fbApp);
   const db = getFirestore(fbApp);
   const provider = new GoogleAuthProvider();
-
-  // 공용 문서 (허용된 사람끼리 공유)
   const SHARED = () => doc(db, "shared", "mealplan");
 
   const WEEKDAYS = ["일","월","화","수","목","금","토"];
@@ -236,10 +249,10 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const normUrl = (u) => { const t=(u||"").trim(); if(!t) return ""; return /^https?:\/\//i.test(t)?t:"https://"+t; };
 
-  const blankPlan = () => ({ meals:{}, dishLibrary:[], have:[], buy:[], ingredientLibrary:[] });
+  const blankPlan = () => ({ meals:{}, dishLibrary:[], have:[], buy:[], ingredientLibrary:[], wishlist:[] });
   let state = { plans:{ adult:blankPlan(), kids:blankPlan() } };
   let currentPlan = "adult";
-  let currentUser = null, saveTimer = null, selKey = null, editDishId = null;
+  let currentUser = null, saveTimer = null, selKey = null, editDishId = null, editWishId = null;
   const today = new Date();
   let vy = today.getFullYear(), vm = today.getMonth();
 
@@ -264,7 +277,7 @@
       if(state.meals || state.have || state.buy){
         state = { plans:{ adult:{
           meals:state.meals||{}, dishLibrary:state.dishLibrary||[],
-          have:state.have||[], buy:state.buy||[], ingredientLibrary:state.ingredientLibrary||[]
+          have:state.have||[], buy:state.buy||[], ingredientLibrary:state.ingredientLibrary||[], wishlist:state.wishlist||[]
         }, kids:blankPlan() } };
       } else { state = { plans:{ adult:blankPlan(), kids:blankPlan() } }; }
     }
@@ -276,6 +289,7 @@
       if(!pl.have) pl.have=[];
       if(!pl.buy) pl.buy=[];
       if(!pl.ingredientLibrary) pl.ingredientLibrary=[];
+      if(!pl.wishlist) pl.wishlist=[];
       Object.keys(pl.meals).forEach(k=>{
         const e=pl.meals[k]; if(!e) return;
         if(!e.dishes){
@@ -329,8 +343,7 @@
     $("monthLabel").textContent = vy+"년 "+(vm+1)+"월";
     const firstDow=new Date(vy,vm,1).getDay(), days=new Date(vy,vm+1,0).getDate();
     const thisMonth=(vy===today.getFullYear()&&vm===today.getMonth());
-    const meals=P().meals;
-    let h="";
+    const meals=P().meals; let h="";
     for(let b=0;b<firstDow;b++) h+='<div class="cell blank"></div>';
     for(let d=1;d<=days;d++){
       const k=keyOf(vy,vm,d), dow=(firstDow+d-1)%7, isT=thisMonth&&d===today.getDate();
@@ -390,6 +403,59 @@
     inp.addEventListener("blur",()=>setTimeout(()=>hideSuggest(boxId),150));
   }
 
+  // ── 먹고싶은 메뉴 ──
+  function renderWish(){
+    const arr=P().wishlist, box=$("wishItems");
+    $("wishCount").textContent=arr.length;
+    if(!arr.length){ box.className="empty-note"; box.style.margin="0 0 12px"; box.innerHTML="아직 없어요. 먹고싶은 요리를 추가해 보세요."; return; }
+    box.className="dishlist"; box.style.margin="";
+    let h="";
+    for(const d of arr){
+      if(editWishId===d.id){
+        h+='<div class="dish"><span class="dish-name">'+esc(d.name)+'</span><input class="field dish-urledit" data-id="'+d.id+'" value="'+esc(d.url||"")+'" placeholder="레시피 주소" /><button class="mini save" data-wsave="'+d.id+'">저장</button></div>';
+      }else{
+        const recipe=d.url?'<a class="recipe" href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">↗ 레시피</a>':'';
+        const linkBtn='<button class="mini" data-weditlink="'+d.id+'">'+(d.url?"링크 수정":"+ 링크")+'</button>';
+        h+='<div class="dish"><span class="dish-name">'+esc(d.name)+'</span>'+recipe+linkBtn+'<button class="dish-del" data-wdel="'+d.id+'" aria-label="삭제">×</button></div>';
+      }
+    }
+    box.innerHTML=h;
+    box.querySelectorAll("[data-wdel]").forEach(b=>b.addEventListener("click",()=>removeWish(b.getAttribute("data-wdel"))));
+    box.querySelectorAll("[data-weditlink]").forEach(b=>b.addEventListener("click",()=>{ editWishId=b.getAttribute("data-weditlink"); renderWish(); const i=box.querySelector('.dish-urledit[data-id="'+editWishId+'"]'); if(i) i.focus(); }));
+    box.querySelectorAll("[data-wsave]").forEach(b=>b.addEventListener("click",()=>{ const id=b.getAttribute("data-wsave"); const i=box.querySelector('.dish-urledit[data-id="'+id+'"]'); saveWishUrl(id, i?i.value:""); }));
+    box.querySelectorAll(".dish-urledit").forEach(i=>i.addEventListener("keydown",e=>{ if(e.key==="Enter") saveWishUrl(i.getAttribute("data-id"), i.value); }));
+  }
+  function addWish(){
+    const name=$("wishName").value.trim(); if(!name) return;
+    const url=normUrl($("wishUrl").value);
+    P().wishlist.push({id:uid(),name,url});
+    $("wishName").value=""; $("wishUrl").value=""; hideSuggest("wishSuggest");
+    save(); renderWish();
+  }
+  function removeWish(id){ const a=P(); a.wishlist=a.wishlist.filter(w=>w.id!==id); save(); renderWish(); }
+  function saveWishUrl(id,raw){ const w=P().wishlist.find(x=>x.id===id); if(!w) return; w.url=normUrl(raw); editWishId=null; save(); renderWish(); }
+
+  // 먹고싶은 메뉴 입력창: 만든 적 있는 요리 자동추천(이름+링크 채움)
+  $("wishName").addEventListener("input",()=>{
+    const v=$("wishName").value.trim().toLowerCase();
+    if(!v){ hideSuggest("wishSuggest"); return; }
+    const matches=P().dishLibrary.filter(d=>d.name.toLowerCase().includes(v)).slice(0,6);
+    if(!matches.length){ hideSuggest("wishSuggest"); return; }
+    const box=$("wishSuggest");
+    box.innerHTML=matches.map(d=>'<div class="suggest-item" data-name="'+esc(d.name)+'" data-url="'+esc(d.url||"")+'">'+esc(d.name)+(d.url?'<span class="u">↗레시피</span>':'')+'</div>').join("");
+    box.classList.remove("hidden");
+    box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",ev=>{
+      ev.preventDefault();
+      $("wishName").value=it.getAttribute("data-name"); $("wishUrl").value=it.getAttribute("data-url");
+      hideSuggest("wishSuggest"); $("wishUrl").focus();
+    }));
+  });
+  $("wishName").addEventListener("blur",()=>setTimeout(()=>hideSuggest("wishSuggest"),150));
+  $("wishName").addEventListener("keydown",e=>{ if(e.key==="Enter") addWish(); });
+  $("wishUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addWish(); });
+  $("wishAdd").addEventListener("click",addWish);
+
+  // ── 날짜 편집(요리 단위) ──
   function openSheet(k){
     selKey=k; editDishId=null;
     const p=k.split("-"), y=+p[0], mo=+p[1]-1, d=+p[2];
@@ -440,22 +506,37 @@
     save(); renderDishes(); renderCalendar();
   }
 
-  $("dishName").addEventListener("input",()=>{
-    const v=$("dishName").value.trim().toLowerCase();
-    if(!v){ hideSuggest("dishSuggest"); return; }
-    const matches=P().dishLibrary.filter(d=>d.name.toLowerCase().includes(v)).slice(0,6);
-    if(!matches.length){ hideSuggest("dishSuggest"); return; }
+  // 요리 등록 추천: 만든요리(dishLibrary) + 먹고싶은메뉴(wishlist), 빈칸이면 먹고싶은메뉴만
+  function getDishSuggestions(q){
+    const map=new Map();
+    for(const d of P().dishLibrary) map.set(d.name,{name:d.name,url:d.url||"",wish:false});
+    for(const w of P().wishlist){ const ex=map.get(w.name); map.set(w.name,{name:w.name,url:w.url||(ex&&ex.url)||"",wish:true}); }
+    let arr=Array.from(map.values());
+    const lc=(q||"").toLowerCase();
+    if(lc) arr=arr.filter(x=>x.name.toLowerCase().includes(lc));
+    else arr=arr.filter(x=>x.wish);
+    arr.sort((a,b)=>(b.wish?1:0)-(a.wish?1:0));
+    return arr.slice(0,8);
+  }
+  function showDishSuggest(){
+    const arr=getDishSuggestions($("dishName").value.trim());
     const box=$("dishSuggest");
-    box.innerHTML=matches.map(d=>'<div class="suggest-item" data-name="'+esc(d.name)+'" data-url="'+esc(d.url||"")+'">'+esc(d.name)+(d.url?'<span class="u">↗ 레시피</span>':'')+'</div>').join("");
+    if(!arr.length){ hideSuggest("dishSuggest"); return; }
+    box.innerHTML=arr.map(x=>{
+      const tags=[]; if(x.wish) tags.push("⭐"); if(x.url) tags.push("↗레시피");
+      return '<div class="suggest-item" data-name="'+esc(x.name)+'" data-url="'+esc(x.url)+'">'+esc(x.name)+(tags.length?'<span class="u">'+tags.join(" ")+'</span>':'')+'</div>';
+    }).join("");
     box.classList.remove("hidden");
     box.querySelectorAll(".suggest-item").forEach(it=>it.addEventListener("mousedown",ev=>{
       ev.preventDefault();
       const nm=it.getAttribute("data-name"), u=it.getAttribute("data-url");
       const e=ensureEntry(selKey); e.dishes.push({id:uid(),name:nm,url:u}); upsertDish(currentPlan,nm,u);
-      $("dishName").value=""; $("dishUrl").value=""; hideSuggest("dishSuggest");
-      save(); renderDishes(); renderCalendar(); $("dishName").focus();
+      $("dishName").value=""; $("dishUrl").value=""; 
+      save(); renderDishes(); renderCalendar(); $("dishName").focus(); showDishSuggest();
     }));
-  });
+  }
+  $("dishName").addEventListener("input",showDishSuggest);
+  $("dishName").addEventListener("focus",showDishSuggest);
   $("dishName").addEventListener("blur",()=>setTimeout(()=>hideSuggest("dishSuggest"),150));
   $("dishName").addEventListener("keydown",e=>{ if(e.key==="Enter") addDish(); });
   $("dishUrl").addEventListener("keydown",e=>{ if(e.key==="Enter") addDish(); });
@@ -467,7 +548,7 @@
     currentPlan=plan; closeSheet();
     document.body.classList.toggle("kids", plan==="kids");
     document.querySelectorAll(".plan-tab").forEach(t=> t.classList.toggle("active", t.getAttribute("data-plan")===plan));
-    renderCalendar(); renderItems();
+    renderCalendar(); renderItems(); renderWish();
   }
   document.querySelectorAll(".plan-tab").forEach(t=> t.addEventListener("click",()=> switchPlan(t.getAttribute("data-plan"))));
 
@@ -498,7 +579,7 @@
     if(user){
       currentUser=user; showOnly("loading");
       await loadFromCloud();
-      renderCalendar(); renderItems(); setSave("saved");
+      renderCalendar(); renderItems(); renderWish(); setSave("saved");
       showOnly("appScreen");
     }else{ currentUser=null; showOnly("loginScreen"); }
   });
